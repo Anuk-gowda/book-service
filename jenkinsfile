@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    tools {
+		maven 'my-maven'
+		jdk 'my-jdk'
+	}
+
+    stages {
+        stage('Git') {
+            steps {
+                echo 'Git clone done'
+                git url:'https://github.com/Yamini6302/book-service.git', branch:'main'
+            }
+        }
+         stage('Build') {
+            steps {
+                echo 'Build done'
+                bat "mvn clean install -DskipTests"
+            }
+         }
+           stage('Deploy') {
+            steps {
+                echo 'Deploy done'
+		bat "docker rm book-service"
+		bat "docker rmi book-service"
+                 bat "docker build -t book-service ."
+			             bat "docker run -p 9999:9999 -d --name book-service book-service"
+            }
+
+        }
+
+    }
+
+}
